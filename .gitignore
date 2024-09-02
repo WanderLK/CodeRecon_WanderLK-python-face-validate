@@ -1,0 +1,13 @@
+
+*.env
+!.env.local
+
+DOCS/
+
+fd/
+
+**/__pycache__
+
+# dependencies
+**/node_modules/
+
