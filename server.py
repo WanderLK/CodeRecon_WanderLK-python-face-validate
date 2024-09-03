@@ -1,11 +1,10 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from pymongo import MongoClient
 import dotenv
 import os
 import facedetect
+import backgroudanalze
 
 dotenv.load_dotenv()
 
@@ -19,15 +18,9 @@ app.add_middleware(
     allow_origins=['*']
 )
 
-MONGODB_URL = os.getenv("MONGODB_URL")
 UPLOAD_FOLDER = './static/uploads'
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-client = MongoClient(MONGODB_URL)
-
-db_name = MONGODB_URL.split('/')[-1].split('?')[0]
-db = client[db_name]
 
 
 @app.get("/")
@@ -41,18 +34,26 @@ async def upload_file(file: UploadFile = File(...)):
         filename = file.filename
         filepath = UPLOAD_FOLDER + '/' + filename
         file_extension = os.path.splitext(filepath)[1]
-        # save face in uploads folder
+
         with open(filepath, "wb") as buffer:
             buffer.write(file.file.read())
 
         result = facedetect.identify_faces(filepath)
 
-        # delete uploaded files
-        os.remove(filepath)
+        if result == True:
+            result = backgroudanalze.check_background(filepath)
+            if result == True:
+               os.remove(filepath)
+               return JSONResponse(status_code=200, content={"result": "image is valid"})
+            else:
+                os.remove(filepath)
+                return JSONResponse(status_code=400, content={"error": "image has a busy background"})
 
-        return JSONResponse(status_code=200, content={"result": result})
+        else :
+            os.remove(filepath)
+            return JSONResponse(status_code=400, content={"error": "image has except one face or no face"})
+        
     
     except Exception as e:
-
         return JSONResponse(status_code=500, content={"error": str(e)})
 
