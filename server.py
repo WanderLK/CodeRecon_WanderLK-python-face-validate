@@ -38,20 +38,20 @@ async def upload_file(file: UploadFile = File(...)):
         with open(filepath, "wb") as buffer:
             buffer.write(file.file.read())
 
-        result = facedetect.identify_faces(filepath)
+        result_face , message_face = facedetect.identify_faces(filepath)
 
-        if result == True:
+        if result_face == True:
             result = backgroudanalze.check_background(filepath)
             if result == True:
                os.remove(filepath)
                return JSONResponse(status_code=200, content={"result": "image is valid"})
             else:
                 os.remove(filepath)
-                return JSONResponse(status_code=400, content={"error": "image has a busy background"})
+                return JSONResponse(status_code=406, content={"error": "image has a busy background"}) # cannot accept
 
         else :
             os.remove(filepath)
-            return JSONResponse(status_code=400, content={"error": "image has except one face or no face"})
+            return JSONResponse(status_code=406, content={"error": message_face})
         
     
     except Exception as e:
