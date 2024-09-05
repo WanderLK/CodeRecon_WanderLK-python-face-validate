@@ -1,7 +1,6 @@
 ### RUN DOCKER
 
-```
-bash
+```bash
 
 docker build -t face-validate .  
 
