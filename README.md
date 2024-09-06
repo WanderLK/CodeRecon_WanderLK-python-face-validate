@@ -19,11 +19,11 @@ setup with docker
 
 To run this project, you will need to add the following environment variables to your .env file
 
-`SECRET_KEY`=
+`SECRET_KEY`=6b1b33fe
 
-`EMAIL`=
+`EMAIL`=easermailsender@gmail.com
 
-`PASSWORD`=
+`PASSWORD`=pyiasdcfpnlnyabd
 
 
 ## Running the app
